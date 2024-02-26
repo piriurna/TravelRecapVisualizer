@@ -15,6 +15,11 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun MapTest() {
+    val markers = listOf(
+        LatLng(1.35, 103.87),
+        LatLng(2.35, 102.87),
+        LatLng(3.35, 101.87)
+    )
     val singapore = LatLng(1.35, 103.87)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(singapore, 10f)
@@ -23,11 +28,13 @@ fun MapTest() {
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState
     ) {
-        Marker(
-            state = MarkerState(position = singapore),
-            title = "Singapore",
-            snippet = "Marker in Singapore"
-        )
+        markers.forEach {
+            Marker(
+                state = MarkerState(position = it),
+                title = "Singapore",
+                snippet = "Marker in Singapore"
+            )
+        }
     }
 }
 
