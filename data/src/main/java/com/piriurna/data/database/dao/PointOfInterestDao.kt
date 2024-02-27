@@ -5,11 +5,12 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.piriurna.data.models.PointOfInterest
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PointOfInterestDao {
     @Query("SELECT * FROM pointofinterest")
-    suspend fun getAll(): List<PointOfInterest>
+    fun getAll(): Flow<List<PointOfInterest>>
 
     @Query("SELECT * FROM pointofinterest WHERE id IN (:ids)")
     suspend fun loadAllByIds(ids: IntArray): List<PointOfInterest>

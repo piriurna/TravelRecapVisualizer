@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -29,19 +30,36 @@ private fun MapScreenContent(
     uiState: MapUiState
 ) {
     Column(modifier = modifier.fillMaxSize()) {
-        val singapore = LatLng(1.35, 103.87)
         val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(singapore, 10f)
+            position = CameraPosition.fromLatLngZoom(
+                LatLng(
+                    uiState.pointsOfInterest.firstOrNull()?.latitude?:0.0,
+                    uiState.pointsOfInterest.firstOrNull()?.longitude?:0.0
+                ),
+                10f
+            )
+        }
+
+        LaunchedEffect(uiState.pointsOfInterest) {
+            cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                LatLng(
+                    uiState.pointsOfInterest.firstOrNull()?.latitude?:0.0,
+                    uiState.pointsOfInterest.firstOrNull()?.longitude?:0.0
+                ),
+                10f
+            )
         }
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState
         ) {
-            Marker(
-                state = MarkerState(position = singapore),
-                title = "Singapore",
-                snippet = "Marker in Singapore"
-            )
+            uiState.pointsOfInterest.forEach {
+                Marker(
+                    state = MarkerState(position = LatLng(it.latitude, it.longitude)),
+                    title = it.name,
+                    snippet = "Marker in ${it.name}",
+                )
+            }
         }
     }
 }
