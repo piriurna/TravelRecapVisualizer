@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -41,14 +42,18 @@ private fun MapScreenContent(
         }
 
         LaunchedEffect(uiState.pointsOfInterest) {
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(
+            val newPos = CameraPosition.fromLatLngZoom(
                 LatLng(
                     uiState.pointsOfInterest.firstOrNull()?.latitude?:0.0,
                     uiState.pointsOfInterest.firstOrNull()?.longitude?:0.0
                 ),
                 10f
             )
+            cameraPositionState.animate(CameraUpdateFactory.newCameraPosition(newPos), 2000)
         }
+
+
+
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState
@@ -63,6 +68,7 @@ private fun MapScreenContent(
         }
     }
 }
+
 
 @Preview
 @Composable
