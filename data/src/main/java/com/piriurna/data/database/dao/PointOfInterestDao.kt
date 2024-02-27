@@ -9,19 +9,19 @@ import com.piriurna.data.models.PointOfInterest
 @Dao
 interface PointOfInterestDao {
     @Query("SELECT * FROM pointofinterest")
-    fun getAll(): List<PointOfInterest>
+    suspend fun getAll(): List<PointOfInterest>
 
     @Query("SELECT * FROM pointofinterest WHERE id IN (:ids)")
-    fun loadAllByIds(ids: IntArray): List<PointOfInterest>
+    suspend fun loadAllByIds(ids: IntArray): List<PointOfInterest>
 
     @Query("SELECT * FROM pointofinterest WHERE latitude LIKE :latitude AND " +
             "longitude LIKE :longitude LIMIT 1"
     )
-    fun findByCoordinates(latitude: Double, longitude: Double): PointOfInterest?
+    suspend fun findByCoordinates(latitude: Double, longitude: Double): PointOfInterest?
 
     @Insert
-    fun insertAll(vararg pointsOfInterest: PointOfInterest)
+    suspend fun insertAll(vararg pointsOfInterest: PointOfInterest)
 
     @Delete
-    fun delete(pointOfInterest: PointOfInterest)
+    suspend fun delete(pointOfInterest: PointOfInterest)
 }
