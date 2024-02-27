@@ -1,10 +1,11 @@
-package com.piriurna.data.database.repositories
+package com.piriurna.data.repositories
 
 import com.piriurna.data.database.dao.PointOfInterestDao
 import com.piriurna.domain.models.PointOfInterest
 import com.piriurna.domain.repositories.PointOfInterestRepository
+import javax.inject.Inject
 
-class PointOfInterestRepositoryImpl(
+class PointOfInterestRepositoryImpl @Inject constructor(
     private val pointOfInterestDao: PointOfInterestDao
 ): PointOfInterestRepository {
 

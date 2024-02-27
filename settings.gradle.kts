@@ -17,3 +17,4 @@ rootProject.name = "Travel Recap Visualizer"
 include(":app")
 include(":domain")
 include(":data")
+include(":dependencyinjection")

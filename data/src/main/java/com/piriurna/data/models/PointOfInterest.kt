@@ -1,4 +1,4 @@
-package com.piriurna.data.database.models
+package com.piriurna.data.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

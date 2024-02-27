@@ -3,18 +3,18 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
     kotlin("kapt") version "1.9.22"
-    alias(libs.plugins.hiltAndroid)
-    alias(libs.plugins.ksp)
+    id("com.google.dagger.hilt.android")
 }
 
 android {
-    namespace = "com.piriurna.data"
+    namespace = "com.piriurna.dependencyinjection"
     compileSdk = 34
 
     defaultConfig {
         minSdk = 29
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -32,20 +32,13 @@ android {
 }
 
 dependencies {
-    api(project(":domain"))
+
+    implementation(project(":data"))
 
     implementation(libs.core.ktx)
-    implementation(libs.appcompat)
-    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
-
-    // ROOM
-    api(libs.androidx.room.runtime)
-    annotationProcessor(libs.androidx.room.compiler)
-    ksp(libs.androidx.room.compiler)
-    api(libs.androidx.room.ktx)
 
     // HILT
     implementation(libs.hilt.android)
