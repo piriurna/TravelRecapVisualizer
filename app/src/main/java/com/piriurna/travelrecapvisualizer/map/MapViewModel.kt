@@ -15,7 +15,10 @@ import javax.inject.Inject
 data class MapUiState(
     val isLoading: Boolean = false,
     val pointsOfInterest: List<PointOfInterestData> = emptyList()
-)
+){
+    fun currentPoi(index: Int) = pointsOfInterest.getOrNull(index)
+}
+
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val loadMapPOIUseCase: LoadMapPOIUseCase

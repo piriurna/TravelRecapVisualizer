@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Travel Recap Visualizer</string>
+    <string name="marker_in">Marker in %1$s</string>
+    <string name="next_poi">Next POI</string>
 </resources>

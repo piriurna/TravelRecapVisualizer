@@ -1,21 +1,34 @@
 package com.piriurna.travelrecapvisualizer.map
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.piriurna.travelrecapvisualizer.R
+import com.piriurna.travelrecapvisualizer.map.utils.MapConstants.DefaultPoiTransitionDuration
+import com.piriurna.travelrecapvisualizer.map.utils.MapConstants.DefaultZoomForPoi
+import com.piriurna.travelrecapvisualizer.map.utils.MapConstants.MinimumZoomForPoi
 
 @Composable
 fun MapScreen(
@@ -28,43 +41,53 @@ fun MapScreen(
 @Composable
 private fun MapScreenContent(
     modifier: Modifier = Modifier,
-    uiState: MapUiState
+    uiState: MapUiState,
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
-        val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(
-                LatLng(
-                    uiState.pointsOfInterest.firstOrNull()?.latitude?:0.0,
-                    uiState.pointsOfInterest.firstOrNull()?.longitude?:0.0
+    val cameraPositionState = rememberCameraPositionState {
+        position = createPositionFromLatitudeLongitudeAndZoom(zoom = DefaultZoomForPoi)
+    }
+
+    var selectedIndex by remember {
+        mutableIntStateOf(0)
+    }
+    LaunchedEffect(selectedIndex) {
+        uiState.currentPoi(selectedIndex)?.let { poiData ->
+            val latLong = LatLng(poiData.latitude, poiData.longitude)
+
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(
+                    latLong,
+                    cameraPositionState.position.zoom.takeIf { it > MinimumZoomForPoi }?:DefaultZoomForPoi
                 ),
-                10f
+                DefaultPoiTransitionDuration
             )
         }
+    }
 
-        LaunchedEffect(uiState.pointsOfInterest) {
-            val newPos = CameraPosition.fromLatLngZoom(
-                LatLng(
-                    uiState.pointsOfInterest.firstOrNull()?.latitude?:0.0,
-                    uiState.pointsOfInterest.firstOrNull()?.longitude?:0.0
-                ),
-                10f
-            )
-            cameraPositionState.animate(CameraUpdateFactory.newCameraPosition(newPos), 2000)
-        }
-
-
-
+    Box(modifier = modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState
+            cameraPositionState = cameraPositionState,
+            googleMapOptionsFactory = { GoogleMapOptions() }
         ) {
             uiState.pointsOfInterest.forEach {
                 Marker(
                     state = MarkerState(position = LatLng(it.latitude, it.longitude)),
                     title = it.name,
-                    snippet = "Marker in ${it.name}",
+                    snippet = stringResource(R.string.marker_in, it.name),
                 )
             }
+        }
+        Button(
+            modifier = Modifier.align(Alignment.TopCenter),
+            onClick = {
+                selectedIndex = if(selectedIndex == uiState.pointsOfInterest.lastIndex)
+                    0
+                else
+                    selectedIndex + 1
+            }
+        ) {
+            Text(text = stringResource(R.string.next_poi))
         }
     }
 }
@@ -78,4 +101,11 @@ fun MapScreenPreview() {
             MapScreenContent(uiState = MapUiState())
         }
     }
+}
+
+private fun createPositionFromLatitudeLongitudeAndZoom(latLng: LatLng = LatLng(0.0, 0.0), zoom: Float): CameraPosition {
+    return CameraPosition.fromLatLngZoom(
+        latLng,
+        zoom
+    )
 }
