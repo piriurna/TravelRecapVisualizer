@@ -50,7 +50,7 @@ private fun MapScreenContent(
     var selectedIndex by remember {
         mutableIntStateOf(0)
     }
-    LaunchedEffect(selectedIndex) {
+    LaunchedEffect(selectedIndex, uiState.pointsOfInterest) {
         uiState.currentPoi(selectedIndex)?.let { poiData ->
             val latLong = LatLng(poiData.latitude, poiData.longitude)
 
