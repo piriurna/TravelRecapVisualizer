@@ -7,4 +7,7 @@ interface PointOfInterestRepository {
 
 
     suspend fun getAll(): Flow<List<PointOfInterestData>>
+
+
+    suspend fun createNewPoi(poi: PointOfInterestData)
 }

@@ -5,7 +5,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import com.piriurna.domain.models.PointOfInterestData
+import com.piriurna.domain.usecases.CreateNewPoiUseCase
 import com.piriurna.domain.usecases.LoadMapPOIUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -21,7 +23,8 @@ data class MapUiState(
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val loadMapPOIUseCase: LoadMapPOIUseCase
+    private val loadMapPOIUseCase: LoadMapPOIUseCase,
+    private val createNewPoiUseCase: CreateNewPoiUseCase
 ): ViewModel() {
 
     private val _uiState: MutableState<MapUiState> = mutableStateOf(MapUiState())
@@ -38,6 +41,19 @@ class MapViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(isLoading = false, pointsOfInterest = it)
             }
 
+        }
+    }
+
+    fun addNewPoi(latLng: LatLng) {
+        viewModelScope.launch {
+            createNewPoiUseCase.invoke(
+                PointOfInterestData(
+                    name = "asda",
+                    latitude = latLng.latitude,
+                    longitude = latLng.longitude,
+                    markerRes = 0
+                )
+            )
         }
     }
 }

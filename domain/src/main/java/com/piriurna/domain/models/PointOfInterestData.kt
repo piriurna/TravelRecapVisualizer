@@ -1,7 +1,7 @@
 package com.piriurna.domain.models
 
 data class PointOfInterestData(
-    val id: Int,
+    val id: Int = 0,
     val latitude: Double,
     val longitude: Double,
     val markerRes: Int,

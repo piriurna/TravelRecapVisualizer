@@ -1,6 +1,8 @@
 package com.piriurna.data.repositories
 
 import com.piriurna.data.database.dao.PointOfInterestDao
+import com.piriurna.data.mapper.toDomain
+import com.piriurna.data.mapper.toDto
 import com.piriurna.domain.models.PointOfInterestData
 import com.piriurna.domain.repositories.PointOfInterestRepository
 import kotlinx.coroutines.flow.Flow
@@ -12,19 +14,12 @@ class PointOfInterestRepositoryImpl @Inject constructor(
 ): PointOfInterestRepository {
 
     override suspend fun getAll(): Flow<List<PointOfInterestData>> {
-        return pointOfInterestDao.getAll().map {
-            it.map { poi ->
-                with(poi) {
-                    PointOfInterestData(
-                        id = id,
-                        latitude = latitude,
-                        longitude = longitude,
-                        markerRes = 0,
-                        name = name
-                    )
-
-                }
-            }
+        return pointOfInterestDao.getAll().map { pointsOfInterest ->
+            pointsOfInterest.map { it.toDomain() }
         }
+    }
+
+    override suspend fun createNewPoi(poi: PointOfInterestData) {
+        return pointOfInterestDao.insertAll(poi.toDto())
     }
 }

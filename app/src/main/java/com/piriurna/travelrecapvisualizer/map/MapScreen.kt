@@ -1,20 +1,28 @@
 package com.piriurna.travelrecapvisualizer.map
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -35,13 +43,15 @@ fun MapScreen(
     modifier: Modifier = Modifier,
     viewModel: MapViewModel = hiltViewModel()
 ) {
-    MapScreenContent(modifier = modifier, uiState = viewModel.uiState.value)
+    MapScreenContent(modifier = modifier, uiState = viewModel.uiState.value, onNewPoiAdded = viewModel::addNewPoi)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MapScreenContent(
     modifier: Modifier = Modifier,
     uiState: MapUiState,
+    onNewPoiAdded: (LatLng) -> Unit = {}
 ) {
     val cameraPositionState = rememberCameraPositionState {
         position = createPositionFromLatitudeLongitudeAndZoom(zoom = DefaultZoomForPoi)
@@ -64,7 +74,52 @@ private fun MapScreenContent(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    val interactionSource = remember { MutableInteractionSource() }
+    var latitudeText by remember { mutableStateOf("") }
+    var longitudeText by remember { mutableStateOf("") }
+    Column(modifier = modifier.fillMaxSize()) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            BasicTextField(
+                value = latitudeText,
+                onValueChange = { latitudeText = it },
+                decorationBox = {
+                    OutlinedTextFieldDefaults.DecorationBox(
+                        enabled = true,
+                        value = latitudeText,
+                        innerTextField = it,
+                        interactionSource = interactionSource,
+                        singleLine = true,
+                        visualTransformation = VisualTransformation.None,
+                        placeholder = { Text("Latitude") }
+                    )
+                }
+            )
+
+            BasicTextField(
+                value = longitudeText,
+                onValueChange = { longitudeText = it },
+                decorationBox = {
+                    OutlinedTextFieldDefaults.DecorationBox(
+                        enabled = true,
+                        value = longitudeText,
+                        innerTextField = it,
+                        interactionSource = interactionSource,
+                        singleLine = true,
+                        visualTransformation = VisualTransformation.None,
+                        placeholder = { Text("Longitude") }
+                    )
+                }
+            )
+        }
+        Button(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            onClick = {
+                onNewPoiAdded(LatLng(latitudeText.toDouble(), longitudeText.toDouble()))
+                selectedIndex++
+            }
+        ) {
+            Text(text = stringResource(R.string.next_poi))
+        }
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
@@ -77,17 +132,6 @@ private fun MapScreenContent(
                     snippet = stringResource(R.string.marker_in, it.name),
                 )
             }
-        }
-        Button(
-            modifier = Modifier.align(Alignment.TopCenter),
-            onClick = {
-                selectedIndex = if(selectedIndex == uiState.pointsOfInterest.lastIndex)
-                    0
-                else
-                    selectedIndex + 1
-            }
-        ) {
-            Text(text = stringResource(R.string.next_poi))
         }
     }
 }
