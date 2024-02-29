@@ -5,6 +5,7 @@ plugins {
     kotlin("kapt") version "1.9.22"
     alias(libs.plugins.hiltAndroid)
     alias(libs.plugins.ksp)
+    kotlin("plugin.serialization") version "1.9.22"
 }
 
 android {
@@ -50,4 +51,11 @@ dependencies {
     // HILT
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+
+    // RETROFIT
+    api(libs.retrofit)
+    api(libs.converter.gson)
+    api(libs.okhttp)
+    api(libs.logging.interceptor)
+    api(libs.kotlinx.serialization.json)
 }
