@@ -1,9 +1,11 @@
 package com.piriurna.travelrecapvisualizer.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.piriurna.travelrecapvisualizer.addpoi.AddPoiScreen
 import com.piriurna.travelrecapvisualizer.map.MapScreen
 
 @Composable
@@ -12,10 +14,14 @@ fun MapNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = "map_screen"
+        startDestination = "add_poi"
     ) {
         composable("map_screen") {
             MapScreen()
+        }
+
+        composable("add_poi") {
+            AddPoiScreen(viewModel = hiltViewModel())
         }
     }
 }
