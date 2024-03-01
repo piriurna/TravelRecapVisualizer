@@ -25,28 +25,34 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.piriurna.travelrecapvisualizer.R
+import com.piriurna.travelrecapvisualizer.common.AppScaffold
 import com.piriurna.travelrecapvisualizer.common.components.CustomTextField
 
 
 @Composable
 fun AddPoiScreen(
     modifier: Modifier = Modifier,
-    viewModel: AddPoiViewModel
+    viewModel: AddPoiViewModel,
+    navController: NavController
 ) {
     val uiState = viewModel.uiState.value
 
-    var queryText by remember { mutableStateOf("") }
+    var searchText by remember { mutableStateOf("") }
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
@@ -68,20 +74,55 @@ fun AddPoiScreen(
         )
     }
 
-    Column(modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Row(modifier = Modifier.fillMaxWidth().height(50.dp)) {
+    AppScaffold(
+        navController = navController,
+        pageTitle = "Add new POI",
+        isBackEnabled = true
+    ) {
+        AddPoiScreenContent(
+            modifier = modifier.padding(it),
+            searchText = searchText,
+            onSearchChange = { searchText = it },
+            onSearchPressed = viewModel::searchQuery,
+            uiState = uiState,
+            cameraPositionState = cameraPositionState,
+            onAddPoiPressed = viewModel::addPoi
+        )
+    }
+}
+
+
+@Composable
+private fun AddPoiScreenContent(
+    modifier: Modifier = Modifier,
+    searchText: String,
+    onSearchChange: (String) -> Unit,
+    onSearchPressed: (String) -> Unit,
+    uiState: AddPoiUiState,
+    cameraPositionState: CameraPositionState,
+    onAddPoiPressed: () -> Unit
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp)) {
 
             CustomTextField(
-                modifier = Modifier.width(300.dp).fillMaxHeight(),
-                value = queryText,
+                modifier = Modifier
+                    .width(300.dp)
+                    .fillMaxHeight(),
+                value = searchText,
                 placeholder = stringResource(R.string.search_a_place),
-                onValueChange = { queryText = it }
+                onValueChange = onSearchChange
             )
 
             Button(
                 modifier = Modifier
                     .fillMaxHeight(),
-                onClick = { viewModel.searchQuery(queryText) },
+                onClick = { onSearchPressed(searchText) },
                 shape = RectangleShape
             ) {
                 Text(text = stringResource(R.string.search))
@@ -102,7 +143,8 @@ fun AddPoiScreen(
                     compassEnabled = false,
                     mapToolbarEnabled = false,
                     zoomControlsEnabled = false,
-                    scrollGesturesEnabled = false
+                    scrollGesturesEnabled = false,
+                    zoomGesturesEnabled = false
                 )
             ) {
                 Marker(
@@ -112,19 +154,26 @@ fun AddPoiScreen(
                 )
             }
 
-           Text(text = uiState.selectedPoi.name, style = MaterialTheme.typography.headlineMedium)
+            Text(
+                modifier = Modifier.padding(horizontal = 32.dp),
+                text = uiState.selectedPoi.name,
+                style = MaterialTheme.typography.headlineMedium,
+                maxLines = 2,
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis
+            )
 
-           Text(
-               text = stringResource(
-                   R.string.lat_lon,
-                   uiState.selectedPoi.latitude,
-                   uiState.selectedPoi.longitude
-               ),
-               style = MaterialTheme.typography.labelLarge,
-               color = Color.Gray
-           )
+            Text(
+                text = stringResource(
+                    R.string.lat_lon,
+                    uiState.selectedPoi.latitude,
+                    uiState.selectedPoi.longitude
+                ),
+                style = MaterialTheme.typography.labelLarge,
+                color = Color.Gray
+            )
 
-            Button(onClick = viewModel::addPoi) {
+            Button(onClick = onAddPoiPressed) {
                 Text(text = stringResource(R.string.add_place))
             }
         }

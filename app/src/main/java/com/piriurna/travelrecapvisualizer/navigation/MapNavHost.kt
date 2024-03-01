@@ -21,7 +21,7 @@ fun MapNavHost(
         }
 
         composable("add_poi") {
-            AddPoiScreen(viewModel = hiltViewModel())
+            AddPoiScreen(viewModel = hiltViewModel(), navController = navController)
         }
     }
 }

@@ -28,6 +28,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.piriurna.travelrecapvisualizer.R
+import com.piriurna.travelrecapvisualizer.common.AppScaffold
 import com.piriurna.travelrecapvisualizer.map.utils.MapConstants.DefaultPoiTransitionDuration
 import com.piriurna.travelrecapvisualizer.map.utils.MapConstants.DefaultZoomForPoi
 import com.piriurna.travelrecapvisualizer.map.utils.MapConstants.MinimumZoomForPoi
@@ -38,11 +39,13 @@ fun MapScreen(
     viewModel: MapViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    MapScreenContent(
-        modifier = modifier,
-        uiState = viewModel.uiState.value,
-        onAddNewPoiPressed = { navController.navigate("add_poi") }
-    )
+    AppScaffold(navController = navController, pageTitle = "Map") {
+        MapScreenContent(
+            modifier = modifier.padding(it),
+            uiState = viewModel.uiState.value,
+            onAddNewPoiPressed = { navController.navigate("add_poi") }
+        )
+    }
 }
 
 @Composable
