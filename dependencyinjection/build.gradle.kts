@@ -41,6 +41,6 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
 
     // HILT
-    implementation(libs.hilt.android)
+    api(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 }
