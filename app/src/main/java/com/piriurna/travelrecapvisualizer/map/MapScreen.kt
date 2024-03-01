@@ -1,18 +1,24 @@
 package com.piriurna.travelrecapvisualizer.map
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.CameraPosition
@@ -29,15 +35,21 @@ import com.piriurna.travelrecapvisualizer.map.utils.MapConstants.MinimumZoomForP
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    viewModel: MapViewModel = hiltViewModel()
+    viewModel: MapViewModel = hiltViewModel(),
+    navController: NavController
 ) {
-    MapScreenContent(modifier = modifier, uiState = viewModel.uiState.value)
+    MapScreenContent(
+        modifier = modifier,
+        uiState = viewModel.uiState.value,
+        onAddNewPoiPressed = { navController.navigate("add_poi") }
+    )
 }
 
 @Composable
 private fun MapScreenContent(
     modifier: Modifier = Modifier,
-    uiState: MapUiState
+    uiState: MapUiState,
+    onAddNewPoiPressed: () -> Unit = {}
 ) {
     val cameraPositionState = rememberCameraPositionState {
         position = createPositionFromLatitudeLongitudeAndZoom(zoom = DefaultZoomForPoi)
@@ -59,7 +71,8 @@ private fun MapScreenContent(
             )
         }
     }
-    Column(modifier = modifier.fillMaxSize()) {
+
+    Box(modifier = modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
@@ -72,6 +85,15 @@ private fun MapScreenContent(
                     snippet = stringResource(R.string.marker_in, it.name),
                 )
             }
+        }
+
+        Button(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 32.dp),
+            onClick = onAddNewPoiPressed
+        ) {
+            Text(text = stringResource(R.string.add_new_poi))
         }
     }
 }

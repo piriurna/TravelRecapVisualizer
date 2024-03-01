@@ -14,10 +14,10 @@ fun MapNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = "add_poi"
+        startDestination = "map_screen"
     ) {
         composable("map_screen") {
-            MapScreen()
+            MapScreen(navController = navController)
         }
 
         composable("add_poi") {
